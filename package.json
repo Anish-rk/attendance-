@@ -6,6 +6,8 @@
     "start": "node server.js"
   },
   "dependencies": {
-    "express": "^5.2.1"
+    "exceljs": "^4.4.0",
+    "express": "^5.2.1",
+    "nodemailer": "^8.0.1"
   }
 }

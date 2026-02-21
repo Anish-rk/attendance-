@@ -5,46 +5,40 @@
   <title>Class Timetable</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Bootstrap -->
   <link
     href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
     rel="stylesheet"
   />
 
-  <!-- Custom CSS -->
   <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
 
-
 <!-- ================= NAVBAR ================= -->
-      <nav class="navbar navbar-expand-lg" id="navbar">
-    <div class="container">
-      <a class="navbar-brand" id="logo"><span>T</span>eacher Panel</a>
+<nav class="navbar navbar-expand-lg" id="navbar">
+  <div class="container">
+    <a class="navbar-brand" id="logo"><span>T</span>eacher Panel</a>
 
-      <div class="collapse navbar-collapse">
-        <ul class="navbar-nav me-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="index.html">Student</a>
-          </li>
+    <div class="collapse navbar-collapse">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="index.html">Student</a>
+        </li>
 
-          <li class="nav-item">
-            <a class="nav-link" href="teacher.html">Go Back</a>
-          </li>
-
-         
-       
-      </div>
+        <li class="nav-item">
+          <a class="nav-link" href="teacher.html">Go Back</a>
+        </li>
+      </ul>
     </div>
-  </nav>
-
+  </div>
+</nav>
 
 <!-- ================= PAGE CONTENT ================= -->
 <div class="container-fluid">
   <div class="row">
 
-    <!-- SIDEBAR (MATCHING TEACHER PAGE) -->
+    <!-- SIDEBAR -->
     <div class="col-md-3 col-lg-2 bg-light vh-100 p-3">
       <h6 class="fw-bold mb-4">Navigation</h6>
 
@@ -86,10 +80,9 @@
         </button>
       </div>
 
-      <div
-        id="statusMsg"
-        class="text-center mt-3 fw-bold text-danger"
-      ></div>
+      <div id="statusMsg"
+        class="text-center mt-3 fw-bold text-danger">
+      </div>
 
     </div>
   </div>
@@ -97,15 +90,13 @@
 
 <!-- ================= SCRIPT ================= -->
 <script>
+
+  // Protect page
   if (!sessionStorage.getItem("teacherLogged")) {
     location.href = "teacher.html";
   }
 
-  function logout() {
-    sessionStorage.clear();
-    location.href = "teacher.html";
-  }
-
+  // Timetable Data
   const timetableData = [
     { period: "1", subject: "Artificial Intelligence" },
     { period: "2", subject: "Cloud Computing" },
@@ -119,6 +110,7 @@
   const stopBtn = document.getElementById("stopBtn");
   const statusMsg = document.getElementById("statusMsg");
 
+  // 🔥 LOAD TABLE PROPERLY
   timetableData.forEach(t => {
     body.innerHTML += `
       <tr>
@@ -127,11 +119,10 @@
       </tr>`;
   });
 
-  function setStatus(status) {
-    sessionStorage.setItem("attendanceActive", status);
-
-    if (status === "started") {
-      statusMsg.textContent = "";
+  // 🔥 UPDATE UI BASED ON STATUS
+  function updateUI(active) {
+    if (active) {
+      statusMsg.textContent = "Attendance is Active";
       startBtn.disabled = true;
       stopBtn.disabled = false;
     } else {
@@ -141,19 +132,35 @@
     }
   }
 
-  startBtn.onclick = () => {
-    setStatus("started");
+  // 🔥 START BUTTON
+  startBtn.onclick = async () => {
+    await fetch("/api/attendance/status", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: "started" })
+    });
+
+    updateUI(true);
     alert("Attendance has started");
   };
 
-  stopBtn.onclick = () => {
-    setStatus("stopped");
+  // 🔥 STOP BUTTON
+  stopBtn.onclick = async () => {
+    await fetch("/api/attendance/status", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: "stopped" })
+    });
+
+    updateUI(false);
     alert("Attendance has stopped");
   };
 
-  // Restore state
-  const currentStatus = sessionStorage.getItem("attendanceActive");
-  setStatus(currentStatus === "started" ? "started" : "stopped");
+  // 🔥 LOAD CURRENT STATUS FROM SERVER
+  fetch("/api/attendance/status")
+    .then(r => r.json())
+    .then(data => updateUI(data.active));
+
 </script>
 
 </body>

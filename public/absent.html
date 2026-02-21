@@ -48,21 +48,17 @@
     location.href = "teacher.html";
   }
 
-  // SAME student ID pattern as your system
+  // ✅ CORRECT STUDENT ID FORMAT (231da001 → 231da060)
   const TOTAL_STUDENTS = Array.from(
     { length: 60 },
-    (_, i) => `S${i + 1}`
+    (_, i) => `231da0${String(i + 1).padStart(2, '0')}`
   );
 
   async function loadAbsentStudents() {
     const res = await fetch("/api/attendance");
     const attendanceData = await res.json();
 
-    /*
-      ✅ FINAL FIX:
-      Only consider students PRESENT if:
-      status === "Present" OR status === "Approved"
-    */
+    // Students considered present
     const presentStudents = new Set(
       attendanceData
         .filter(a =>
@@ -92,10 +88,10 @@
     });
   }
 
-  // Load fresh data
+  // Load data
   loadAbsentStudents();
 
-  // Auto refresh every 8 seconds (safe)
+  // Auto refresh
   setInterval(loadAbsentStudents, 8000);
 </script>
 

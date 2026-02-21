@@ -11,44 +11,42 @@
 
 <body>
 
- <!-- ================= NAVBAR ================= -->
-    <nav class="navbar navbar-expand-lg" id="navbar">
-      <div class="container">
-        <a class="navbar-brand" id="logo"><span>T</span>eacher Login</a>
+<!-- ================= NAVBAR ================= -->
+<nav class="navbar navbar-expand-lg" id="navbar">
+  <div class="container">
+    <a class="navbar-brand" id="logo"><span>T</span>eacher Login</a>
 
-        <div class="collapse navbar-collapse">
-          <ul class="navbar-nav me-auto">
-            <li class="nav-item">
-              <a class="nav-link" href="index.html">Student</a>
-            </li>
-            <button
-        id="logoutBtn"
-        class="btn btn-danger btn-sm"
-        style="display:none"
-        onclick="teacherLogout()"
-      >
-        Logout
-      </button>
-          </ul>
-        </div>
-      </div>
-    </nav>
-    
-    
-  
+    <div class="collapse navbar-collapse">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="index.html">Student</a>
+        </li>
+        <button
+          id="logoutBtn"
+          class="btn btn-danger btn-sm"
+          style="display:none"
+          onclick="teacherLogout()"
+        >
+          Logout
+        </button>
+      </ul>
+    </div>
+  </div>
+</nav>
+
 <!-- LOGIN -->
 <section id="teacherLoginSection" class="page">
   <div class="login-card">
     <h3 class="text-center mb-3">Teacher Login</h3>
     <input id="teacherName" class="form-control mb-2" placeholder="Teacher Name" />
     <span id="teacherNameError" class="text-danger"></span>
+
     <input id="teacherPassword" type="password" class="form-control mt-3" placeholder="Password" />
     <span id="teacherError" class="text-danger"></span>
+
     <button class="btn btn-warning w-100 mt-3" onclick="teacherLogin()">Login</button>
   </div>
 </section>
-
-
 
 <!-- DASHBOARD -->
 <section id="teacherDashboard" style="display:none">
@@ -90,22 +88,33 @@
           <tbody id="attendanceTable"></tbody>
         </table>
 
-        <div class="mt-5">
-          <h5 class="text-center mb-3">Attendance Summary</h5>
-          <canvas id="attendanceChart" height="300"></canvas>
+        <!-- Chart -->
+        <div class="mt-5 text-center">
+          <h5 class="mb-3">Attendance Summary</h5>
+
+          <div style="max-width:300px; margin:0 auto;">
+            <canvas id="attendanceChart"></canvas>
+          </div>
         </div>
+
+        <!-- 🔥 ADDED ONLY THIS SECTION -->
+        <div class="text-center mt-4">
+          <a href="/api/export" class="btn btn-success">
+            Download Excel Report
+          </a>
+        </div>
+        <!-- 🔥 END ADDITION -->
 
       </div>
     </div>
   </div>
 </section>
 
- <!-- FOOTER -->
-    <footer id="footer">
-      <h4><span>A</span>ttendance</h4>
-      <p>records panel</p>
-    </footer>
-
+<!-- FOOTER -->
+<footer id="footer">
+  <h4><span>A</span>ttendance</h4>
+  <p>records panel</p>
+</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -117,6 +126,7 @@ function teacherLogin() {
     teacherError.textContent = "Invalid password";
     return;
   }
+
   sessionStorage.setItem("teacherLogged", "yes");
   sessionStorage.setItem("teacherName", teacherName.value);
 
@@ -158,16 +168,28 @@ function loadAttendanceChart() {
 
       if (attendanceChart) attendanceChart.destroy();
 
-      attendanceChart = new Chart(attendanceChart = document.getElementById("attendanceChart"), {
-        type: "doughnut",
-        data: {
-          labels: ["Present", "Absent"],
-          datasets: [{
-            data: [present, total - present],
-            backgroundColor: ["#ffc107", "#dc3545"]
-          }]
+      attendanceChart = new Chart(
+        document.getElementById("attendanceChart"),
+        {
+          type: "doughnut",
+          data: {
+            labels: ["Present", "Absent"],
+            datasets: [{
+              data: [present, total - present],
+              backgroundColor: ["#ffc107", "#dc3545"]
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+              legend: {
+                position: "bottom"
+              }
+            }
+          }
         }
-      });
+      );
     });
 }
 
